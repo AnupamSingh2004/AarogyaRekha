@@ -178,29 +178,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ],
         ),
 
-        // Modern Logo
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.local_hospital_rounded,
-            color: Color(0xFF2E7D8A),
-            size: 36,
-          ),
-        ),
-
-        const SizedBox(height: 16),
+       
 
         // App Logo
         Container(
