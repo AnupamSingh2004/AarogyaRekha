@@ -68,7 +68,7 @@ class GoogleAuthService {
                       '2. Package name doesn\'t match\n'
                       '3. Android OAuth client not properly configured\n\n'
                       'Current SHA-1: 03:BA:58:0D:5B:E6:F0:8B:95:59:AB:3C:CA:5D:1E:05:6E:2E:EA:49\n'
-                      'Package: com.example.first_app\n\n'
+                      'Package: com.aarogyarekha.app\n\n'
                       'Please verify these match exactly in Google Cloud Console.'
           };
         }
