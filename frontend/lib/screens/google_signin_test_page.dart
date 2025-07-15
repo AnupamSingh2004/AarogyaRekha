@@ -169,10 +169,12 @@ class _GoogleSignInTestPageState extends State<GoogleSignInTestPage> {
                   const SizedBox(height: 8),
                   const Text(
                     '1. Test backend connection first\n'
-                    '2. Make sure you have set up Google Cloud Console\n'
-                    '3. Update the client IDs in google_auth_config.dart\n'
-                    '4. Use SHA-1: 03:BA:58:0D:5B:E6:F0:8B:95:59:AB:3C:CA:5D:1E:05:6E:2E:EA:49\n'
-                    '5. Package name: com.aarogyarekha.app',
+                    '2. For Android emulator: Use 10.0.2.2:8000 instead of localhost\n'
+                    '3. For physical device: Use your host IP (check terminal output)\n'
+                    '4. Make sure Docker backend is running on host machine\n'
+                    '5. Set up Google Cloud Console with provided credentials\n'
+                    '6. Package name: com.aarogyarekha.app\n'
+                    '7. SHA-1: 03:BA:58:0D:5B:E6:F0:8B:95:59:AB:3C:CA:5D:1E:05:6E:2E:EA:49',
                     style: TextStyle(fontSize: 12),
                   ),
                 ],
@@ -191,12 +193,12 @@ class _GoogleSignInTestPageState extends State<GoogleSignInTestPage> {
     });
 
     try {
-      // Test basic connection
-      final healthResult = await ApiTestService.testConnection();
+      // Test multiple URLs for better connectivity
+      final healthResult = await ApiTestService.testConnectionMultiple();
       
       if (healthResult['success']) {
         setState(() {
-          _status = 'Backend connection successful! ✅';
+          _status = 'Backend connection successful! ✅\nUsing: ${healthResult['workingUrl']}';
           _lastResult = healthResult;
         });
         
@@ -210,9 +212,9 @@ class _GoogleSignInTestPageState extends State<GoogleSignInTestPage> {
           };
           
           if (authResult['success']) {
-            _status = 'Backend and auth endpoints working! ✅';
+            _status = 'Backend and auth endpoints working! ✅\nUsing: ${healthResult['workingUrl']}';
           } else {
-            _status = 'Backend OK, but auth endpoint issue: ${authResult['message']} ⚠️';
+            _status = 'Backend OK, but auth endpoint issue: ${authResult['message']} ⚠️\nUsing: ${healthResult['workingUrl']}';
           }
         });
       } else {
@@ -287,6 +289,18 @@ class _GoogleSignInTestPageState extends State<GoogleSignInTestPage> {
     
     if (result['message'] != null) {
       formatted += 'Message: ${result['message']}\n\n';
+    }
+    
+    if (result['suggestion'] != null) {
+      formatted += 'Suggestion: ${result['suggestion']}\n\n';
+    }
+    
+    if (result['baseUrl'] != null) {
+      formatted += 'Base URL: ${result['baseUrl']}\n\n';
+    }
+    
+    if (result['platform'] != null) {
+      formatted += 'Platform: ${result['platform']}\n\n';
     }
     
     if (result['accessToken'] != null) {

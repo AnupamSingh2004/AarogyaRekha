@@ -9,8 +9,16 @@ class GoogleAuthConfig {
 
   static String get serverClientId => webClientId;
   
-  static String get apiBaseUrl => 
-    dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000/api';
+  static String get apiBaseUrl {
+    final baseUrl = dotenv.env['API_BASE_URL'];
+    if (baseUrl == null) {
+      _throwMissingEnvError('API_BASE_URL');
+    }
+    
+    // Always use the configured base URL without modification
+    // The .env file should contain the correct IP for the current network
+    return baseUrl!;
+  }
 
   static String _throwMissingEnvError(String key) {
     throw Exception(

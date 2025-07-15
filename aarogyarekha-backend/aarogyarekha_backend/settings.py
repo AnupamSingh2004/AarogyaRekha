@@ -183,11 +183,17 @@ CORS_ALLOWED_ORIGINS = [
     "http://10.0.2.2:8000",  # Android emulator
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://192.168.1.6:8000",  # Your current IP
-    "http://192.168.1.6:3000",  # Frontend on your IP
+    "http://192.168.165.1:8000",  # Current host IP
+    "http://192.168.165.1:3000",  # Frontend on host IP
     # Flutter/Dart specific origins
     "http://localhost:50000",
     "http://127.0.0.1:50000",
+    # Additional mobile origins
+    "http://10.0.2.2:3000",
+    "http://10.0.2.2:50000",
+    # Add more IP ranges for mobile devices
+    "http://192.168.0.0:8000",
+    "http://192.168.1.0:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True

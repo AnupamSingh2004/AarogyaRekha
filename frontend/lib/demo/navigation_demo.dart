@@ -19,7 +19,7 @@ class NavigationDemo extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'MediCare Navigation Demo',
+      title: 'AarogyaRekha Navigation Demo',
       navigatorKey: NavigationService.navigatorKey,
       theme: ThemeData(
         primarySwatch: Colors.blue,

@@ -173,9 +173,34 @@ class _LoginPageState extends State<LoginPage> {
 
         const SizedBox(height: 16),
 
+        // App Logo
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(0, 4),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.asset(
+              'assets/logo/logo.jpeg',
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
         // App Name
         const Text(
-          'MediCare',
+          'AarogyaRekha',
           style: TextStyle(
             color: Colors.white,
             fontSize: 28,
