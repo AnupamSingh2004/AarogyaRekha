@@ -6,7 +6,9 @@ import 'health_check_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String userType;
+  
+  const ProfileScreen({super.key, required this.userType});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();

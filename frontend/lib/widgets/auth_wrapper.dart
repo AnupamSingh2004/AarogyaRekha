@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../screens/login_page.dart';
-import '../widgets/main_layout.dart';
+import '../screens/user_type_selection_screen.dart';
 import '../models/user_model.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -116,7 +116,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     }
 
     if (_isAuthenticated && _user != null) {
-      return MainLayoutController(user: _user!);
+      return const UserTypeSelectionScreen();
     } else {
       return const LoginPage();
     }

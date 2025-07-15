@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ChatbotScreen extends StatefulWidget {
-  const ChatbotScreen({super.key});
+  final String userType;
+  
+  const ChatbotScreen({super.key, required this.userType});
 
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
