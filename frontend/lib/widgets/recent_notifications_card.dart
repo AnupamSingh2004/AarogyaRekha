@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class RecentNotificationsCard extends StatelessWidget {
-  const RecentNotificationsCard({Key? key}) : super(key: key);
+  final VoidCallback? onViewAllNotifications;
+  
+  const RecentNotificationsCard({
+    Key? key,
+    this.onViewAllNotifications,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +46,7 @@ class RecentNotificationsCard extends StatelessWidget {
               ),
               const Spacer(),
               TextButton(
-                onPressed: () {
-                  // Navigate to all notifications
-                },
+                onPressed: onViewAllNotifications,
                 child: const Text(
                   'View All',
                   style: TextStyle(

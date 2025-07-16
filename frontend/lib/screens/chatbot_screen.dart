@@ -6,8 +6,15 @@ import '../models/chat_model.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final String userType;
+  final String? initialMessage;
+  final String? context;
   
-  const ChatbotScreen({super.key, required this.userType});
+  const ChatbotScreen({
+    super.key, 
+    required this.userType,
+    this.initialMessage,
+    this.context,
+  });
 
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
@@ -36,9 +43,51 @@ class _ChatbotScreenState extends State<ChatbotScreen> with TickerProviderStateM
     try {
       await GeminiService.initialize();
       _addWelcomeMessage();
+      
+      // If there's a context or initial message, process it
+      if (widget.context != null || widget.initialMessage != null) {
+        await _handleInitialContext();
+      }
     } catch (e) {
       _addSystemMessage("⚠️ AI service is temporarily unavailable. You can still get basic health advice.");
     }
+  }
+
+  Future<void> _handleInitialContext() async {
+    if (widget.context != null) {
+      // Add context-based message
+      String contextMessage = _getContextualMessage();
+      setState(() {
+        messages.add(ChatMessage.bot(contextMessage));
+      });
+      _scrollToBottom();
+    }
+    
+    if (widget.initialMessage != null) {
+      // Auto-send the initial message
+      await Future.delayed(const Duration(milliseconds: 500));
+      _sendSpecificMessage(widget.initialMessage!);
+    }
+  }
+
+  String _getContextualMessage() {
+    String context = widget.context ?? '';
+    
+    if (context.contains('EMERGENCY')) {
+      return "🚨 **Emergency Alert Response**\n\nI see you're dealing with an emergency health situation. Let me provide immediate guidance and preventive measures.\n\nWhat specific assistance do you need right now?";
+    } else if (context.contains('DENGUE')) {
+      return "🦟 **Dengue Prevention Assistant**\n\nI'm here to help you with dengue prevention measures. Let me guide you through:\n\n• Immediate actions to take\n• Breeding site elimination\n• Personal protection methods\n• When to seek medical help\n\nWhat would you like to know first?";
+    } else if (context.contains('MALARIA')) {
+      return "🦟 **Malaria Prevention Assistant**\n\nI can help you with comprehensive malaria prevention strategies:\n\n• Mosquito control methods\n• Personal protection measures\n• Symptom recognition\n• Environmental management\n\nHow can I assist you?";
+    } else if (context.contains('TYPHOID')) {
+      return "💧 **Typhoid Prevention Assistant**\n\nI'm here to help with typhoid prevention and safety measures:\n\n• Water and food safety\n• Hygiene practices\n• Vaccination information\n• Symptom awareness\n\nWhat specific guidance do you need?";
+    } else if (context.contains('VACCINATION')) {
+      return "💉 **Vaccination Information**\n\nI can provide guidance about vaccination campaigns and immunization:\n\n• Vaccine schedules\n• Preparation for vaccination\n• Post-vaccination care\n• Addressing concerns\n\nWhat would you like to know?";
+    } else if (context.contains('PREVENTION')) {
+      return "🛡️ **Health Prevention Assistant**\n\nI'm ready to help you with preventive health measures:\n\n• General prevention strategies\n• Seasonal health tips\n• Lifestyle modifications\n• Risk reduction methods\n\nWhat specific prevention topic can I help with?";
+    }
+    
+    return "🩺 **Health Assistant**\n\nI'm here to provide specific guidance based on your health concern. How can I help you today?";
   }
 
   void _addWelcomeMessage() {
@@ -83,6 +132,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> with TickerProviderStateM
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
+    await _sendSpecificMessage(text);
+  }
+
+  Future<void> _sendSpecificMessage(String text) async {
     // Add user message
     final userMessage = ChatMessage.user(text);
     setState(() {

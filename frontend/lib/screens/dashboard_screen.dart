@@ -9,8 +9,15 @@ import 'package:geolocator/geolocator.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String userType;
+  final VoidCallback? onNavigateToRiskMap;
+  final VoidCallback? onNavigateToAlerts;
   
-  const DashboardScreen({Key? key, required this.userType}) : super(key: key);
+  const DashboardScreen({
+    Key? key, 
+    required this.userType,
+    this.onNavigateToRiskMap,
+    this.onNavigateToAlerts,
+  }) : super(key: key);
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -119,6 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               RiskStatusCard(
                 healthPrediction: _healthPrediction,
                 isLoading: _isLoading,
+                onViewRiskMap: widget.onNavigateToRiskMap,
               ),
               const SizedBox(height: 16),
               
@@ -131,7 +139,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 16),
               
               // Recent Notifications
-              const RecentNotificationsCard(),
+              RecentNotificationsCard(
+                onViewAllNotifications: widget.onNavigateToAlerts,
+              ),
               const SizedBox(height: 16),
               
               // User Specific Actions

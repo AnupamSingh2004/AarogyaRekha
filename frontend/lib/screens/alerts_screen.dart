@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'chatbot_screen.dart';
+import '../services/alerts_service.dart';
 
 class AlertsScreen extends StatefulWidget {
   final String userType;
@@ -12,6 +14,63 @@ class AlertsScreen extends StatefulWidget {
 class _AlertsScreenState extends State<AlertsScreen> {
   String _selectedFilter = 'All';
   final List<String> _filters = ['All', 'Active', 'Emergency', 'Prevention', 'History'];
+  
+  List<AlertData> _allAlerts = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAlerts();
+  }
+
+  Future<void> _loadAlerts() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      List<AlertData> alerts = await AlertsService.generateAlertsFromPrediction();
+      setState(() {
+        _allAlerts = alerts;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to load alerts: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Filter alerts based on selected filter
+  List<AlertData> get _filteredAlerts {
+    List<AlertData> filtered;
+    if (_selectedFilter == 'All') {
+      filtered = _allAlerts;
+    } else {
+      filtered = _allAlerts.where((alert) => alert.type == _selectedFilter.toUpperCase()).toList();
+    }
+    
+    // Sort by urgent first, then by timestamp (most recent first)
+    filtered.sort((a, b) {
+      if (a.isUrgent && !b.isUrgent) return -1;
+      if (!a.isUrgent && b.isUrgent) return 1;
+      return b.timestamp.compareTo(a.timestamp);
+    });
+    
+    return filtered;
+  }
+
+  // Get count for each filter category
+  int _getFilterCount(String filter) {
+    if (filter == 'All') {
+      return _allAlerts.length;
+    }
+    return _allAlerts.where((alert) => alert.type == filter.toUpperCase()).length;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +88,18 @@ class _AlertsScreenState extends State<AlertsScreen> {
         elevation: 0,
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              _loadAlerts();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Refreshing alerts...'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
               _showFilterDialog();
@@ -36,7 +107,66 @@ class _AlertsScreenState extends State<AlertsScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: _isLoading
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Color(0xFF2E7D8A),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Loading health alerts...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : _errorMessage != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error Loading Alerts',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.red[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadAlerts,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2E7D8A),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
         children: [
           // Filter bar
           Container(
@@ -46,10 +176,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: _filters.map((filter) {
+                  final count = _getFilterCount(filter);
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
-                      label: Text(filter),
+                      label: Text('$filter ($count)'),
                       selected: _selectedFilter == filter,
                       onSelected: (selected) {
                         setState(() {
@@ -70,62 +201,108 @@ class _AlertsScreenState extends State<AlertsScreen> {
             ),
           ),
           
-          // Alerts list
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
+          // Summary header
+          Container(
+            color: Colors.grey[50],
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildAlertCard(
-                  'EMERGENCY',
-                  'Dengue Outbreak Alert',
-                  'Immediate action required: High dengue risk detected in sector 7. Increased breeding sites identified through satellite imagery.',
-                  Icons.emergency,
-                  Colors.red,
-                  '2 hours ago',
-                  true,
+                Text(
+                  'Showing ${_filteredAlerts.length} alert${_filteredAlerts.length != 1 ? 's' : ''}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                const SizedBox(height: 12),
-                _buildAlertCard(
-                  'ACTIVE',
-                  'Malaria Prevention',
-                  'Moderate malaria risk in your area. Ensure proper mosquito control measures are in place.',
-                  Icons.warning,
-                  Colors.orange,
-                  '5 hours ago',
-                  false,
-                ),
-                const SizedBox(height: 12),
-                _buildAlertCard(
-                  'PREVENTION',
-                  'Seasonal Health Tips',
-                  'Monsoon season approaching. Follow these guidelines to prevent water-borne diseases.',
-                  Icons.info,
-                  Colors.blue,
-                  '1 day ago',
-                  false,
-                ),
-                const SizedBox(height: 12),
-                _buildAlertCard(
-                  'ACTIVE',
-                  'Vaccination Campaign',
-                  'Free vaccination camp scheduled for tomorrow at Primary Health Center.',
-                  Icons.vaccines,
-                  Colors.green,
-                  '2 days ago',
-                  false,
-                ),
-                const SizedBox(height: 12),
-                _buildAlertCard(
-                  'HISTORY',
-                  'Weather Update',
-                  'Heavy rainfall alert for next 48 hours. Risk of water stagnation increased.',
-                  Icons.grain,
-                  Colors.grey,
-                  '3 days ago',
-                  false,
-                ),
+                if (_filteredAlerts.any((alert) => alert.isUrgent))
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${_filteredAlerts.where((alert) => alert.isUrgent).length} urgent',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
               ],
             ),
+          ),
+          
+          // Alerts list
+          Expanded(
+            child: _filteredAlerts.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.notifications_off,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No alerts found',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'No alerts match the selected filter',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      await _loadAlerts();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Alerts updated'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _filteredAlerts.length,
+                      itemBuilder: (context, index) {
+                        final alert = _filteredAlerts[index];
+                        return Column(
+                          children: [
+                            _buildAlertCard(
+                              alert.type,
+                              alert.title,
+                              alert.description,
+                              alert.icon,
+                              alert.color,
+                              alert.time,
+                              alert.isUrgent,
+                            ),
+                            if (index < _filteredAlerts.length - 1)
+                              const SizedBox(height: 12),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
@@ -272,7 +449,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          // View details
+                          _showAlertDetails(type, title, description, color);
                         },
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: color),
@@ -288,14 +465,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Take action
+                          _navigateToAssistant(type, title, description);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: color,
                           foregroundColor: Colors.white,
                         ),
                         child: const Text(
-                          'Take Action',
+                          'Get Help',
                           style: TextStyle(fontSize: 12),
                         ),
                       ),
@@ -308,6 +485,146 @@ class _AlertsScreenState extends State<AlertsScreen> {
         ],
       ),
     );
+  }
+
+  void _showAlertDetails(String type, String title, String description, Color color) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  type,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                description,
+                style: const TextStyle(fontSize: 14, height: 1.4),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info, color: Colors.blue, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'For immediate assistance and preventive measures, click "Get Help" to chat with our AI assistant.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _navigateToAssistant(type, title, description);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Get Help'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToAssistant(String type, String title, String description) {
+    // Create context and initial message based on alert type
+    String alertContext = '$type: $title';
+    String initialMessage = _createInitialMessage(type, title, description);
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatbotScreen(
+          userType: widget.userType,
+          context: alertContext,
+          initialMessage: initialMessage,
+        ),
+      ),
+    );
+  }
+
+  String _createInitialMessage(String type, String title, String description) {
+    String baseMessage = 'I received an alert about: $title. ';
+    
+    switch (type) {
+      case 'EMERGENCY':
+        if (title.contains('Dengue')) {
+          return baseMessage + 'What immediate actions should I take to prevent dengue? What are the key steps to eliminate breeding sites?';
+        } else if (title.contains('Malaria')) {
+          return baseMessage + 'What are the urgent malaria prevention measures I should implement right now?';
+        } else {
+          return baseMessage + 'What emergency preventive measures should I take immediately?';
+        }
+      
+      case 'ACTIVE':
+        if (title.contains('Malaria')) {
+          return baseMessage + 'What are the comprehensive malaria prevention strategies I should follow?';
+        } else if (title.contains('Vaccination')) {
+          return baseMessage + 'What should I know about this vaccination campaign? How should I prepare?';
+        } else {
+          return baseMessage + 'What preventive actions should I take based on this alert?';
+        }
+      
+      case 'PREVENTION':
+        if (title.contains('Seasonal')) {
+          return baseMessage + 'What seasonal health precautions should I take? What are the key prevention strategies?';
+        } else {
+          return baseMessage + 'What preventive measures should I implement?';
+        }
+      
+      case 'HISTORY':
+        return baseMessage + 'Based on this historical information, what preventive measures should I continue or implement?';
+      
+      default:
+        return baseMessage + 'Can you provide specific guidance and preventive measures for this situation?';
+    }
   }
 
   void _showFilterDialog() {

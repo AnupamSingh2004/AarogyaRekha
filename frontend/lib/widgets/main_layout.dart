@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/dynamic_bottom_nav.dart';
 import '../models/user_model.dart';
-import '../screens/user_type_selection_screen.dart';
+import '../widgets/main_navigation.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget child;
@@ -38,7 +38,7 @@ class MainLayoutController extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Redirect to user type selection screen since we're now using the new navigation structure
-    return const UserTypeSelectionScreen();
+    // Redirect to main navigation with default user type
+    return const MainNavigation(userType: 'Rural');
   }
 }

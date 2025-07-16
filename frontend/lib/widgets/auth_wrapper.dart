@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../screens/login_page.dart';
-import '../screens/user_type_selection_screen.dart';
+import '../widgets/main_navigation.dart';
 import '../models/user_model.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -116,7 +116,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
     }
 
     if (_isAuthenticated && _user != null) {
-      return const UserTypeSelectionScreen();
+      // Skip user type selection and go directly to main navigation with default user type
+      return const MainNavigation(userType: 'Rural');
     } else {
       return const LoginPage();
     }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import 'upload_prescription_screen.dart';
-import 'my_prescriptions_screen.dart';
-import 'health_check_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../widgets/auth_wrapper.dart';
+import '../services/location_service.dart';
+import 'package:geolocator/geolocator.dart';
+import 'notifications_screen.dart';
+import 'privacy_security_screen.dart';
+import 'settings_screen.dart';
+import 'about_help_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userType;
@@ -18,11 +22,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? userProfile;
   bool isLoading = true;
   String? errorMessage;
+  bool isLoadingLocation = false;
+  Position? currentPosition;
 
   @override
   void initState() {
     super.initState();
     _loadUserProfile();
+    _getCurrentLocationAutomatically();
   }
 
   Future<void> _loadUserProfile() async {
@@ -59,7 +66,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         Navigator.of(context).pop();
         if (result['success']) {
-          Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+          // Navigate to login screen (AuthWrapper will handle the redirect)
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const AuthWrapper()),
+            (route) => false,
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(result['message'] ?? 'Logout failed')),
@@ -73,6 +84,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SnackBar(content: Text('Logout failed')),
         );
       }
+    }
+  }
+
+  Future<void> _getCurrentLocationAutomatically() async {
+    try {
+      Position? position = await LocationService.getCurrentLocation();
+      if (position != null) {
+        setState(() {
+          currentPosition = position;
+        });
+        
+        // Update the user profile with location silently
+        String locationString = LocationService.getFormattedLocation(position);
+        // Here you could update the backend with the new location
+        print('Location updated automatically: $locationString');
+      }
+    } catch (e) {
+      print('Error getting location automatically: $e');
     }
   }
 
@@ -172,12 +201,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         userProfile?['email'] ?? 'email@example.com',
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (userProfile?['location'] != null)
+                      if (currentPosition != null)
+                        Text("📍 ${LocationService.getFormattedLocation(currentPosition!)}")
+                      else if (userProfile?['location'] != null)
                         Text("📍 ${userProfile!['location']}")
                       else if (userProfile?['city'] != null && userProfile?['country'] != null)
                         Text("📍 ${userProfile!['city']}, ${userProfile!['country']}")
                       else
-                        const Text("📍 Location not set")
+                        Row(
+                          children: [
+                            if (isLoadingLocation)
+                              const Row(
+                                children: [
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text("Getting location..."),
+                                ],
+                              )
+                            else
+                              const Text("📍 Location not available"),
+                          ],
+                        )
                     ],
                   ),
                 ),
@@ -194,45 +242,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            
-
-            // Quick Actions
-            Row(
-              children: [
-                Expanded(
-                  child: quickAction(
-                    Icons.upload, 
-                    "Upload\nPrescription",
-                    () async {
-                      final result = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const UploadPrescriptionScreen(),
-                        ),
-                      );
-                      if (result == true) {
-                        _loadUserProfile();
-                      }
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: quickAction(
-                    Icons.favorite_border, 
-                    "Health\nCheck",
-                    () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const HealthCheckScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
             // Account Section
             
         
@@ -240,9 +249,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.notifications_outlined, 
               "Notifications",
               () {
-                // TODO: Navigate to Notifications screen when available
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Notifications feature coming soon')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsScreen(),
+                  ),
                 );
               },
             ),
@@ -250,9 +261,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.lock_outline, 
               "Privacy & Security",
               () {
-                // TODO: Navigate to Privacy & Security screen when available
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Privacy & Security feature coming soon')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacySecurityScreen(),
+                  ),
                 );
               },
             ),
@@ -260,9 +273,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.support_agent, 
               "Help & Support",
               () {
-                // TODO: Navigate to Help & Support screen when available
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Help & Support feature coming soon')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutHelpScreen(),
+                  ),
                 );
               },
             ),
@@ -270,20 +285,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.settings, 
               "Settings",
               () {
-                // TODO: Navigate to Settings screen when available
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Settings feature coming soon')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsScreen(userType: widget.userType),
+                  ),
                 );
               },
             ),
 
             const SizedBox(height: 20),
 
-            // Health Tip
+            // Health Insight Card
             Container(
-              padding: const EdgeInsets.all(12),
-              color: Colors.yellow[100],
-              child: const Text("💡 Health Tip of the Day\nAlways ask your pharmacist for generic alternatives to save up to 90% on your medicine costs!"),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF2E7D8A).withAlpha(26),
+                    const Color(0xFF2E7D8A).withAlpha(13),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFF2E7D8A).withAlpha(51),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2E7D8A),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.lightbulb_outline,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "💡 AarogyaRekha Insight",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2E7D8A),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Check your risk map daily to stay informed about health conditions in your area. Early awareness helps prevent disease outbreaks!",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),
@@ -346,35 +416,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget quickAction(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 24, 
-              backgroundColor: Colors.grey[200], 
-              child: Icon(icon),
-            ),
-            const SizedBox(height: 6),
-            Flexible(
-              child: Text(
-                label, 
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 12),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

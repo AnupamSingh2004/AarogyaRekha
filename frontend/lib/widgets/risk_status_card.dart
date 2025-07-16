@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class RiskStatusCard extends StatelessWidget {
   final Map<String, dynamic>? healthPrediction;
   final bool isLoading;
+  final VoidCallback? onViewRiskMap;
   
   const RiskStatusCard({
     Key? key,
     this.healthPrediction,
     this.isLoading = false,
+    this.onViewRiskMap,
   }) : super(key: key);
 
   @override
@@ -71,9 +73,7 @@ class RiskStatusCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                // Navigate to detailed risk map
-              },
+              onPressed: onViewRiskMap,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2E7D8A),
                 foregroundColor: Colors.white,
