@@ -18,20 +18,30 @@ By leveraging satellite data, climatic patterns, and behavioral insights, Aarogy
 
 ## 🎥 Demo Video
 
-<!-- Replace with actual video link -->
-[![AarogyaRekha Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
-*Click to watch the full demo*
+
+https://github.com/user-attachments/assets/587c3f94-a49d-4ed8-8263-d56318387a04
+
+
+
+
 
 ## 📱 Screenshots
 
 ### Mobile App Interface
-<div align="center">
-  <img src="screenshots/dashboard.png" alt="Dashboard" width="200"/>
-  <img src="screenshots/risk-map.png" alt="Risk Map" width="200"/>
-  <img src="screenshots/alerts.png" alt="Alerts" width="200"/>
-  <img src="screenshots/chatbot.png" alt="AI Chatbot" width="200"/>
-</div>
+
+![WhatsApp Image 2025-07-16 at 9 53 11 AM(1)](https://github.com/user-attachments/assets/7ee0cce0-99e7-473b-aae6-08a4a71739f5)
+![WhatsApp Image 2025-07-16 at 9 53 11 AM](https://github.com/user-attachments/assets/acde075b-b754-48b2-a7f9-799d902ccc02)
+![WhatsApp Image 2025-07-16 at 9 53 10 AM(2)](https://github.com/user-attachments/assets/8521e27c-7096-4bf9-bdf6-53c7a1ad915d)
+![WhatsApp Image 2025-07-16 at 9 53 10 AM(1)](https://github.com/user-attachments/assets/9c284055-607f-4a8a-a3a9-127fe76c3603)
+![WhatsApp Image 2025-07-16 at 9 53 10 AM](https://github.com/user-attachments/assets/3bf5820f-bcd4-4546-acd3-d51e1d8e7078)
+![WhatsApp Image 2025-07-16 at 9 53 09 AM(3)](https://github.com/user-attachments/assets/2d8bb1c3-4a90-4bca-9add-d9fac237326c)
+![WhatsApp Image 2025-07-16 at 9 53 09 AM(2)](https://github.com/user-attachments/assets/520ec360-8710-4df3-a4ed-e92d5df1c4b9)
+![WhatsApp Image 2025-07-16 at 9 53 09 AM(1)](https://github.com/user-attachments/assets/d0103546-1e16-4297-84cf-e8ee47f8477e)
+![WhatsApp Image 2025-07-16 at 9 53 09 AM](https://github.com/user-attachments/assets/b81ab416-1c93-4373-a9c2-ed2b17b0b093)
+![WhatsApp Image 2025-07-16 at 9 53 08 AM](https://github.com/user-attachments/assets/9bd7cd2a-e412-499d-a02f-7d96af853772)
+
+
 
 ## 🌟 Key Features
 
