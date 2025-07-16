@@ -382,14 +382,6 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 
 
-## 📊 Impact Metrics
-
-- 📈 **Disease Prediction Accuracy**: 87%
-- 🏥 **PHCs Using Platform**: 150+
-- 👥 **Active Users**: 25,000+
-- 📍 **Villages Covered**: 500+
-- 🚨 **Early Alerts Sent**: 10,000+
-
 ## 🎁 Benefits at a Glance
 
 | Benefit | Impact |
@@ -408,26 +400,6 @@ AarogyaRekha aligns with key government initiatives:
 - **Swachh Bharat Abhiyan**
 - **Poshan Abhiyaan**
 - **Digital India Initiative**
-
-## 📞 Support & Community
-
-- 💬 **Discord Community**: [Join our Discord](https://discord.gg/aarogyarekha)
-- 📧 **Email Support**: support@aarogyarekha.in
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/aarogyarekha/issues)
-- 📚 **Documentation**: [Full Documentation](https://docs.aarogyarekha.in)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Ministry of Health and Family Welfare** for guidance and support
-- **ISRO** for satellite data access
-- **WHO** for health guidelines and standards
-- **Open Source Community** for amazing tools and libraries
-- **ASHA Workers** for field testing and feedback
-
 ## 👥 Contributors
 
 This application was developed during the **Hack4Health Hackathon** by:
