@@ -251,37 +251,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
 
             // Account Section
-            sectionTile(
-              Icons.medical_services_outlined, 
-              "My Prescriptions",
-              () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const MyPrescriptionsScreen(),
-                  ),
-                );
-              },
-            ),
-            sectionTile(
-              Icons.note_add_outlined, 
-              "Health Records",
-              () {
-                // TODO: Navigate to Health Records screen when available
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Health Records feature coming soon')),
-                );
-              },
-            ),
-            sectionTile(
-              Icons.calendar_today_outlined, 
-              "Appointment History",
-              () {
-                // TODO: Navigate to Appointment History screen when available
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Appointment History feature coming soon')),
-                );
-              },
-            ),
+            
+        
             sectionTile(
               Icons.notifications_outlined, 
               "Notifications",
