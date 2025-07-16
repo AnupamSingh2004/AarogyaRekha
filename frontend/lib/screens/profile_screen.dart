@@ -194,24 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            const Text("Your Healthcare Journey", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 2.5,
-              children: [
-                statCard("₹${userProfile?['total_savings'] ?? '0'}", "Total Savings"),
-                statCard("${userProfile?['medicines_searched'] ?? '0'}", "Medicines Searched"),
-                statCard("${userProfile?['stores_visited'] ?? '0'}", "Stores Visited"),
-                statCard("${userProfile?['schemes_applied'] ?? '0'}", "Schemes Applied"),
-              ],
-            ),
-
-            const SizedBox(height: 20),
+            
 
             // Quick Actions
             Row(
