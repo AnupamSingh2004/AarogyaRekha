@@ -54,6 +54,28 @@ services:
     networks:
       - aarogyarekha_network
 
+  prediction-service:
+    build: ./disease_prediction
+    container_name: aarogyarekha_prediction
+    restart: always
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./disease_prediction:/app
+    environment:
+      - DEBUG=${DEBUG:-False}
+      - FLASK_ENV=${FLASK_ENV:-production}
+    depends_on:
+      - web
+    networks:
+      - aarogyarekha_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
 volumes:
   postgres_data:
   static_volume:

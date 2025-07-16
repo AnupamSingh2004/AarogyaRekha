@@ -6,6 +6,11 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
+# Import prediction proxy views
+from prediction_proxy import (
+    predict_disease, predict_batch, prediction_info, prediction_health_check
+)
+
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def health_check(request):
@@ -18,6 +23,12 @@ urlpatterns = [
     path('api/prescriptions/', include('prescriptions.urls')),
     path('api/health/', health_check, name='health_check'),
     path('accounts/', include('allauth.urls')),
+    
+    # Prediction proxy endpoints
+    path('api/predict/', predict_disease, name='predict_disease'),
+    path('api/predict/batch/', predict_batch, name='predict_batch'),
+    path('api/predict/info/', prediction_info, name='prediction_info'),
+    path('api/predict/health/', prediction_health_check, name='prediction_health_check'),
 ]
 
 # Serve media files in development

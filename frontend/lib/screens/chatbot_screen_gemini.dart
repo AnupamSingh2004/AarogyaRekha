@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import '../services/gemini_service.dart';
 import '../models/chat_model.dart';
 
@@ -284,55 +283,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> with TickerProviderStateM
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Use Markdown for bot messages, regular Text for user messages
-                  message.isUser 
-                      ? Text(
-                          message.content,
-                          style: TextStyle(
-                            color: message.isUser ? Colors.white : Colors.black87,
-                            fontSize: 16,
-                            height: 1.4,
-                          ),
-                        )
-                      : MarkdownBody(
-                          data: message.content,
-                          styleSheet: MarkdownStyleSheet(
-                            p: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 16,
-                              height: 1.4,
-                            ),
-                            h1: const TextStyle(
-                              color: Color(0xFF2E7D8A),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            h2: const TextStyle(
-                              color: Color(0xFF2E7D8A),
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            h3: const TextStyle(
-                              color: Color(0xFF2E7D8A),
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            strong: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2E7D8A),
-                            ),
-                            em: const TextStyle(
-                              fontStyle: FontStyle.italic,
-                            ),
-                            code: TextStyle(
-                              backgroundColor: Colors.grey.withOpacity(0.1),
-                              fontFamily: 'monospace',
-                            ),
-                            listBullet: const TextStyle(
-                              color: Color(0xFF2E7D8A),
-                            ),
-                          ),
-                        ),
+                  Text(
+                    message.content,
+                    style: TextStyle(
+                      color: message.isUser ? Colors.white : Colors.black87,
+                      fontSize: 16,
+                      height: 1.4,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     _formatTime(message.timestamp),

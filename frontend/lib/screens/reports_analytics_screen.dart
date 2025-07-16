@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/health_prediction_service.dart';
 
 class ReportsAnalyticsScreen extends StatefulWidget {
   final String userType;
@@ -12,6 +13,33 @@ class ReportsAnalyticsScreen extends StatefulWidget {
 class _ReportsAnalyticsScreenState extends State<ReportsAnalyticsScreen> {
   String selectedTimeRange = 'Last 30 Days';
   String selectedDisease = 'All Diseases';
+  Map<String, dynamic>? currentPrediction;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPredictionData();
+  }
+
+  Future<void> _loadPredictionData() async {
+    setState(() {
+      isLoading = true;
+    });
+    
+    try {
+      final prediction = await HealthPredictionService.getCurrentHealthPrediction();
+      setState(() {
+        currentPrediction = prediction;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error loading prediction data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +49,10 @@ class _ReportsAnalyticsScreenState extends State<ReportsAnalyticsScreen> {
         backgroundColor: const Color(0xFF2E7D8A),
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: isLoading ? null : _loadPredictionData,
+          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
@@ -205,54 +237,103 @@ class _ReportsAnalyticsScreenState extends State<ReportsAnalyticsScreen> {
   }
 
   Widget _buildDiseaseStats() {
-    final diseases = [
-      {'name': 'Malaria', 'cases': 245, 'change': '+12%', 'color': Colors.red},
-      {'name': 'Dengue', 'cases': 89, 'change': '-5%', 'color': Colors.orange},
-      {'name': 'Diarrhea', 'cases': 156, 'change': '+8%', 'color': Colors.blue},
-      {'name': 'Malnutrition', 'cases': 78, 'change': '-15%', 'color': Colors.purple},
-    ];
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (currentPrediction == null || !currentPrediction!['success']) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Text(
+          'Unable to load disease statistics',
+          style: TextStyle(
+            color: Colors.grey,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    final probabilities = currentPrediction!['probabilities'] as Map<String, dynamic>;
+    final diseases = probabilities.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     return Column(
-      children: diseases.map((disease) {
+      children: diseases.map((entry) {
+        final disease = entry.key;
+        final probability = entry.value;
+        final isHighest = entry == diseases.first;
+        
+        Color diseaseColor;
+        switch (disease.toLowerCase()) {
+          case 'malaria':
+            diseaseColor = Colors.red;
+            break;
+          case 'dengue':
+            diseaseColor = Colors.orange;
+            break;
+          case 'typhoid':
+            diseaseColor = Colors.blue;
+            break;
+          case 'healthy':
+            diseaseColor = Colors.green;
+            break;
+          default:
+            diseaseColor = Colors.purple;
+        }
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: disease['color'] as Color,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  disease['name'] as String,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isHighest ? diseaseColor.withOpacity(0.1) : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: isHighest ? Border.all(color: diseaseColor, width: 2) : null,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: diseaseColor,
+                    borderRadius: BorderRadius.circular(6),
                   ),
                 ),
-              ),
-              Text(
-                '${disease['cases']} cases',
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    disease,
+                    style: TextStyle(
+                      fontWeight: isHighest ? FontWeight.bold : FontWeight.w500,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                disease['change'] as String,
-                style: TextStyle(
-                  color: (disease['change'] as String).startsWith('+') 
-                      ? Colors.red : Colors.green,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
+                Text(
+                  '${(probability * 100).toStringAsFixed(1)}%',
+                  style: TextStyle(
+                    color: isHighest ? diseaseColor : Colors.grey,
+                    fontSize: 14,
+                    fontWeight: isHighest ? FontWeight.bold : FontWeight.normal,
+                  ),
                 ),
-              ),
-            ],
+                if (isHighest) ...[
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.trending_up,
+                    color: diseaseColor,
+                    size: 16,
+                  ),
+                ],
+              ],
+            ),
           ),
         );
       }).toList(),
@@ -381,98 +462,159 @@ class _ReportsAnalyticsScreenState extends State<ReportsAnalyticsScreen> {
   }
 
   Widget _buildPredictionTimeline() {
-    final predictions = [
-      {
-        'disease': 'Malaria',
-        'risk': 'High',
-        'timeframe': 'Next 2 weeks',
-        'confidence': 85,
-        'color': Colors.red,
-      },
-      {
-        'disease': 'Dengue',
-        'risk': 'Medium',
-        'timeframe': 'Next 3 weeks',
-        'confidence': 65,
-        'color': Colors.orange,
-      },
-      {
-        'disease': 'Diarrhea',
-        'risk': 'Low',
-        'timeframe': 'Next month',
-        'confidence': 45,
-        'color': Colors.green,
-      },
-    ];
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
 
-    return Column(
-      children: predictions.map((prediction) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: (prediction['color'] as Color).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border(
-              left: BorderSide(
-                width: 4,
-                color: prediction['color'] as Color,
+    if (currentPrediction == null || !currentPrediction!['success']) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Column(
+          children: [
+            Icon(
+              Icons.warning_amber,
+              size: 48,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Unable to load prediction data',
+              style: TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.w600,
               ),
             ),
+            Text(
+              'Please check your connection and try again',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final prediction = currentPrediction!['prediction'];
+    final confidence = currentPrediction!['confidence'];
+    final location = currentPrediction!['location'];
+    
+    // Get risk level and color
+    final riskLevel = HealthPredictionService.getRiskLevel(prediction, confidence);
+    final riskColor = HealthPredictionService.getRiskColor(riskLevel);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: riskColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border(
+          left: BorderSide(
+            width: 4,
+            color: riskColor,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    prediction['disease'] as String,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: prediction['color'] as Color,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      prediction['risk'] as String,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Prediction: $prediction',
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Expected: ${prediction['timeframe']}',
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
+                    const SizedBox(height: 4),
+                    Text(
+                      'Location: $location',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Confidence: ${prediction['confidence']}%',
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: riskColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  riskLevel,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
-        );
-      }).toList(),
+          const SizedBox(height: 12),
+          Text(
+            'Confidence: ${(confidence * 100).toStringAsFixed(1)}%',
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Last Updated: ${DateTime.now().toString().split('.')[0]}',
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Recommendations:',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...HealthPredictionService.getRecommendations(prediction, confidence)
+              .take(3)
+              .map((rec) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('• ', style: TextStyle(fontSize: 16)),
+                    Expanded(
+                      child: Text(
+                        rec,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ))
+              .toList(),
+        ],
+      ),
     );
   }
 

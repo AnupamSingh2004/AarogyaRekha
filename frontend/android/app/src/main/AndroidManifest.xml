@@ -3,6 +3,10 @@
     <!-- Add internet permission for Google Sign-In -->
     <uses-permission android:name="android.permission.INTERNET" />
     
+    <!-- Location permissions for maps -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
     <application
         android:label="AarogyaRekha"
         android:name="${applicationName}"
