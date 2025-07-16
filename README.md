@@ -31,29 +31,34 @@ https://github.com/user-attachments/assets/587c3f94-a49d-4ed8-8263-d56318387a04
 ### Mobile App Interface
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/7ee0cce0-99e7-473b-aae6-08a4a71739f5" alt="Dashboard Screen" width="350" height="600"/>
-  <img src="https://github.com/user-attachments/assets/acde075b-b754-48b2-a7f9-799d902ccc02" alt="Health Prediction" width="350" height="600"/>
+  <img src="https://github.com/user-attachments/assets/9bd7cd2a-e412-499d-a02f-7d96af853772" alt="Settings" width="350" height="850"/>
+  <img src="https://github.com/user-attachments/assets/b81ab416-1c93-4373-a9c2-ed2b17b0b093" alt="Prescriptions" width="350" height="850"/>
 </div>
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/8521e27c-7096-4bf9-bdf6-53c7a1ad915d" alt="Risk Map" width="350" height="600"/>
-  <img src="https://github.com/user-attachments/assets/9c284055-607f-4a8a-a3a9-127fe76c3603" alt="Alert System" width="350" height="600"/>
+  <img src="https://github.com/user-attachments/assets/d0103546-1e16-4297-84cf-e8ee47f8477e" alt="User Profile" width="350" height="850"/>
+  <img src="https://github.com/user-attachments/assets/520ec360-8710-4df3-a4ed-e92d5df1c4b9" alt="Reports & Analytics" width="350" height="850"/>
+</div>
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/2d8bb1c3-4a90-4bca-9add-d9fac237326c" alt="AI Chatbot" width="350" height="850"/>
+  <img src="https://github.com/user-attachments/assets/3bf5820f-bcd4-4546-acd3-d51e1d8e7078" alt="Satellite Intelligence" width="350" height="850"/>
 </div>
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/3bf5820f-bcd4-4546-acd3-d51e1d8e7078" alt="Satellite Intelligence" width="350" height="600"/>
-  <img src="https://github.com/user-attachments/assets/2d8bb1c3-4a90-4bca-9add-d9fac237326c" alt="AI Chatbot" width="350" height="600"/>
+  <img src="https://github.com/user-attachments/assets/9c284055-607f-4a8a-a3a9-127fe76c3603" alt="Alert System" width="350" height="850"/>
+  <img src="https://github.com/user-attachments/assets/8521e27c-7096-4bf9-bdf6-53c7a1ad915d" alt="Risk Map" width="350" height="850"/>
 </div>
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/520ec360-8710-4df3-a4ed-e92d5df1c4b9" alt="Reports & Analytics" width="350" height="600"/>
-  <img src="https://github.com/user-attachments/assets/d0103546-1e16-4297-84cf-e8ee47f8477e" alt="User Profile" width="350" height="600"/>
+  <img src="https://github.com/user-attachments/assets/acde075b-b754-48b2-a7f9-799d902ccc02" alt="Health Prediction" width="350" height="850"/>
+  <img src="https://github.com/user-attachments/assets/7ee0cce0-99e7-473b-aae6-08a4a71739f5" alt="Dashboard Screen" width="350" height="850"/>
 </div>
 
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/b81ab416-1c93-4373-a9c2-ed2b17b0b093" alt="Prescriptions" width="350" height="600"/>
-  <img src="https://github.com/user-attachments/assets/9bd7cd2a-e412-499d-a02f-7d96af853772" alt="Settings" width="350" height="600"/>
-</div>
+
+
+
+
+
 
 
 
