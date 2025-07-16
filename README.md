@@ -30,17 +30,6 @@ By leveraging satellite data, climatic patterns, and behavioral insights, Aarogy
   <img src="screenshots/chatbot.png" alt="AI Chatbot" width="200"/>
 </div>
 
-### Web Dashboard
-<div align="center">
-  <img src="screenshots/web-dashboard.png" alt="Web Dashboard" width="800"/>
-</div>
-
-### Health Worker Interface
-<div align="center">
-  <img src="screenshots/health-worker-dashboard.png" alt="Health Worker Dashboard" width="400"/>
-  <img src="screenshots/field-work.png" alt="Field Work Interface" width="400"/>
-</div>
-
 ## 🌟 Key Features
 
 ### 🤖 AI-Powered Disease Prevention
