@@ -423,6 +423,48 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Open Source Community** for amazing tools and libraries
 - **ASHA Workers** for field testing and feedback
 
+## 👥 Contributors
+
+This application was developed during the **Hack4Health Hackathon** by:
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/Prakriti308">
+          <img src="https://github.com/Prakriti308.png" width="100px;" alt="Prakriti308"/>
+          <br />
+          <sub><b>Prakriti308</b></sub>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/princepal99">
+          <img src="https://github.com/princepal99.png" width="100px;" alt="princepal99"/>
+          <br />
+          <sub><b>princepal99</b></sub>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/Sanskriti-Pal">
+          <img src="https://github.com/Sanskriti-Pal.png" width="100px;" alt="Sanskriti Pal"/>
+          <br />
+          <sub><b>Sanskriti Pal</b></sub>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/AnupamSingh2004">
+          <img src="https://github.com/AnupamSingh2004.png" width="100px;" alt="AnupamSingh2004"/>
+          <br />
+          <sub><b>AnupamSingh2004</b></sub>
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
+
+### 🏆 Hackathon Achievement
+**AarogyaRekha** was developed as part of the **Hack4Health Hackathon**, showcasing innovative solutions for preventive healthcare through AI and satellite technology. Our team collaborated intensively to create this comprehensive health prediction and alert system that addresses real-world healthcare challenges in rural India.
+
 ---
 
 <div align="center">
