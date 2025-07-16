@@ -3,7 +3,6 @@ import '../services/api_service.dart';
 import '../services/google_auth_service.dart';
 import '../widgets/auth_wrapper.dart';
 import 'register_page.dart';
-import 'google_signin_test_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -128,20 +127,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-      ),
-      // Debug FAB for Google Sign-In testing
-      floatingActionButton: FloatingActionButton(
-        mini: true,
-        backgroundColor: Colors.amber,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const GoogleSignInTestPage(),
-            ),
-          );
-        },
-        child: const Icon(Icons.bug_report, color: Colors.black),
       ),
     );
   }

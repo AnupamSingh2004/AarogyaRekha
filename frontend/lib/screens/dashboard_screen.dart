@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../widgets/risk_status_card.dart';
 import '../widgets/emergency_contacts_card.dart';
 import '../widgets/recent_notifications_card.dart';
-import '../widgets/user_specific_actions.dart';
 import '../services/health_prediction_service.dart';
 import '../services/location_service.dart';
 import 'package:geolocator/geolocator.dart';
@@ -142,10 +141,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               RecentNotificationsCard(
                 onViewAllNotifications: widget.onNavigateToAlerts,
               ),
-              const SizedBox(height: 16),
-              
-              // User Specific Actions
-              UserSpecificActions(userType: widget.userType),
               const SizedBox(height: 16),
               
               // Community Health Snapshot
@@ -417,14 +412,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_healthPrediction == null || !_healthPrediction!['success']) {
       return [
         _buildSatelliteDataCard('Water Bodies', 'N/A', Icons.water, Colors.grey, 'Data unavailable'),
-        _buildSatelliteDataCard('Vegetation', 'N/A', Icons.grass, Colors.grey, 'Data unavailable'),
+        _buildSatelliteDataCard('Sanitation', 'N/A', Icons.cleaning_services, Colors.grey, 'Data unavailable'),
         _buildSatelliteDataCard('Temperature', 'N/A', Icons.thermostat, Colors.grey, 'Data unavailable'),
         _buildSatelliteDataCard('Humidity', 'N/A', Icons.opacity, Colors.grey, 'Data unavailable'),
       ];
     }
 
     String prediction = _healthPrediction!['prediction'];
-    double confidence = _healthPrediction!['confidence'];
     String areaName = _healthPrediction!['location'] ?? 'Unknown Area';
 
     // Dynamic data based on prediction and area
@@ -451,23 +445,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ));
     }
 
-    // Vegetation - NDVI affects disease vectors
-    double ndviValue = _getNDVIValue(areaName, prediction);
-    if (prediction.toLowerCase() == 'healthy' && confidence > 0.9) {
+    // Sanitation - affects disease transmission
+    if (prediction.toLowerCase() == 'dengue' || prediction.toLowerCase() == 'malaria') {
+      int sanitationScore = _getSanitationScore(areaName);
       cards.add(_buildSatelliteDataCard(
-        'Vegetation',
-        'NDVI: ${ndviValue.toStringAsFixed(2)}',
-        Icons.grass,
-        Colors.green,
-        'Healthy vegetation',
+        'Sanitation',
+        'Score: $sanitationScore/100',
+        Icons.cleaning_services,
+        Colors.red,
+        'Poor sanitation',
+      ));
+    } else if (prediction.toLowerCase() == 'typhoid' || prediction.toLowerCase() == 'diarrhea') {
+      int sanitationScore = _getSanitationScore(areaName);
+      cards.add(_buildSatelliteDataCard(
+        'Sanitation',
+        'Score: $sanitationScore/100',
+        Icons.cleaning_services,
+        Colors.orange,
+        'Needs improvement',
       ));
     } else {
+      int sanitationScore = _getSanitationScore(areaName, isHealthy: true);
       cards.add(_buildSatelliteDataCard(
-        'Vegetation',
-        'NDVI: ${ndviValue.toStringAsFixed(2)}',
-        Icons.grass,
-        Colors.orange,
-        'Moderate density',
+        'Sanitation',
+        'Score: $sanitationScore/100',
+        Icons.cleaning_services,
+        Colors.green,
+        'Good sanitation',
       ));
     }
 
@@ -544,31 +548,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return isHealthy ? baseCount : (baseCount * 1.5).round();
   }
 
-  double _getNDVIValue(String areaName, String prediction) {
-    // Area-specific NDVI values
-    Map<String, double> ndviValues = {
-      'Karol Bagh': 0.45,
-      'Connaught Place': 0.3,
-      'Chanakyapuri': 0.65,
-      'Dwarka': 0.55,
-      'Rohini': 0.6,
-      'Lajpat Nagar': 0.4,
-      'Vasant Kunj': 0.7,
-      'Mayur Vihar': 0.5,
-      'Pitampura': 0.55,
-      'Seelampur': 0.35,
-      'Najafgarh': 0.4,
-      'Greater Kailash': 0.6,
+  int _getSanitationScore(String areaName, {bool isHealthy = false}) {
+    // Area-specific sanitation scores out of 100
+    Map<String, int> sanitationScores = {
+      'Karol Bagh': 75,
+      'Connaught Place': 85,
+      'Chanakyapuri': 92,
+      'Dwarka': 78,
+      'Rohini': 72,
+      'Lajpat Nagar': 68,
+      'Vasant Kunj': 88,
+      'Mayur Vihar': 65,
+      'Pitampura': 74,
+      'Seelampur': 45,
+      'Najafgarh': 52,
+      'Greater Kailash': 82,
     };
     
-    double baseValue = ndviValues[areaName] ?? 0.5;
-    
-    // Adjust based on prediction
-    if (prediction.toLowerCase() == 'healthy') {
-      return baseValue + 0.1;
-    } else {
-      return baseValue - 0.1;
-    }
+    int baseScore = sanitationScores[areaName] ?? 70;
+    return isHealthy ? (baseScore + 10).clamp(0, 100) : (baseScore - 15).clamp(0, 100);
   }
 
   double _getTemperature(String areaName, String prediction) {
