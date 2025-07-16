@@ -351,11 +351,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 - [ ] Multi-state deployment
 - [ ] Advanced ML features
 
-## 🏆 Recognition & Awards
 
-- 🥇 **Hack4Health Winner** - Best Healthcare Innovation
-- 🏅 **Smart India Hackathon** - Finalist
-- 🎖️ **Ministry of Health Recognition** - Innovative Solution
 
 ## 📊 Impact Metrics
 
