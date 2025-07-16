@@ -450,8 +450,8 @@ This application was developed during the **Hack4Health Hackathon** by:
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/Sanskriti-Pal">
-          <img src="https://github.com/Sanskriti-Pal.png" width="100px;" alt="Sanskriti Pal"/>
+        <a href="https://github.com/Sankso">
+          <img src="https://github.com/Sankso.png" width="100px;" alt="Sanskriti Pal"/>
           <br />
           <sub><b>Sanskriti Pal</b></sub>
         </a>
