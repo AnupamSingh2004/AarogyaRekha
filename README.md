@@ -482,9 +482,6 @@ This application was developed during the **Hack4Health Hackathon** by:
 <div align="center">
   <p>Made with ❤️ for India's Healthcare Future</p>
   <p>
-    <a href="https://aarogyarekha.in">Website</a> •
-    <a href="https://docs.aarogyarekha.in">Documentation</a> •
-    <a href="https://github.com/yourusername/aarogyarekha/issues">Report Bug</a> •
     <a href="https://github.com/yourusername/aarogyarekha/issues">Request Feature</a>
   </p>
 </div>
