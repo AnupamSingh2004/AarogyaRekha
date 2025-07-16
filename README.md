@@ -23,6 +23,9 @@ By leveraging satellite data, climatic patterns, and behavioral insights, Aarogy
 https://github.com/user-attachments/assets/587c3f94-a49d-4ed8-8263-d56318387a04
 
 
+## Presentation
+
+[Click here to view the presentation](https://docs.google.com/presentation/d/15ZrNp3PPfow25XWRmxWCd0ObyUBhTON5wkk3iI3HX6g/edit?usp=sharing)
 
 
 
