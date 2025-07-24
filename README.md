@@ -23,6 +23,9 @@ By leveraging satellite data, climatic patterns, and behavioral insights, Aarogy
 https://github.com/user-attachments/assets/587c3f94-a49d-4ed8-8263-d56318387a04
 
 
+## Presentation
+
+[Click here to view the presentation](https://docs.google.com/presentation/d/15ZrNp3PPfow25XWRmxWCd0ObyUBhTON5wkk3iI3HX6g/edit?usp=sharing)
 
 
 
@@ -382,14 +385,6 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 
 
-## 📊 Impact Metrics
-
-- 📈 **Disease Prediction Accuracy**: 87%
-- 🏥 **PHCs Using Platform**: 150+
-- 👥 **Active Users**: 25,000+
-- 📍 **Villages Covered**: 500+
-- 🚨 **Early Alerts Sent**: 10,000+
-
 ## 🎁 Benefits at a Glance
 
 | Benefit | Impact |
@@ -408,26 +403,6 @@ AarogyaRekha aligns with key government initiatives:
 - **Swachh Bharat Abhiyan**
 - **Poshan Abhiyaan**
 - **Digital India Initiative**
-
-## 📞 Support & Community
-
-- 💬 **Discord Community**: [Join our Discord](https://discord.gg/aarogyarekha)
-- 📧 **Email Support**: support@aarogyarekha.in
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/aarogyarekha/issues)
-- 📚 **Documentation**: [Full Documentation](https://docs.aarogyarekha.in)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Ministry of Health and Family Welfare** for guidance and support
-- **ISRO** for satellite data access
-- **WHO** for health guidelines and standards
-- **Open Source Community** for amazing tools and libraries
-- **ASHA Workers** for field testing and feedback
-
 ## 👥 Contributors
 
 This application was developed during the **Hack4Health Hackathon** by:
@@ -450,8 +425,8 @@ This application was developed during the **Hack4Health Hackathon** by:
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/Sanskriti-Pal">
-          <img src="https://github.com/Sanskriti-Pal.png" width="100px;" alt="Sanskriti Pal"/>
+        <a href="https://github.com/Sankso">
+          <img src="https://github.com/Sankso.png" width="100px;" alt="Sanskriti Pal"/>
           <br />
           <sub><b>Sanskriti Pal</b></sub>
         </a>
@@ -482,9 +457,6 @@ This application was developed during the **Hack4Health Hackathon** by:
 <div align="center">
   <p>Made with ❤️ for India's Healthcare Future</p>
   <p>
-    <a href="https://aarogyarekha.in">Website</a> •
-    <a href="https://docs.aarogyarekha.in">Documentation</a> •
-    <a href="https://github.com/yourusername/aarogyarekha/issues">Report Bug</a> •
     <a href="https://github.com/yourusername/aarogyarekha/issues">Request Feature</a>
   </p>
 </div>
