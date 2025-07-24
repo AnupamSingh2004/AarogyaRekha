@@ -7,22 +7,33 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY') or config('SECRET_KEY', default='django-insecure-development-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true' or config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,10.0.2.2').split(',')
+# Get allowed hosts from environment or config
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
+if allowed_hosts_env:
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+else:
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,10.0.2.2').split(',')
 
 # Azure App Service specific settings
-AZURE_APP_SERVICE = config('AZURE_APP_SERVICE', default=False, cast=bool)
+AZURE_APP_SERVICE = os.getenv('AZURE_APP_SERVICE', 'False').lower() == 'true' or config('AZURE_APP_SERVICE', default=False, cast=bool)
 
 if AZURE_APP_SERVICE:
     # Add Azure App Service domain to allowed hosts
-    AZURE_DOMAIN = config('AZURE_DOMAIN', default='')
+    AZURE_DOMAIN = os.getenv('AZURE_DOMAIN') or config('AZURE_DOMAIN', default='')
     if AZURE_DOMAIN:
         ALLOWED_HOSTS.append(AZURE_DOMAIN)
         ALLOWED_HOSTS.append(f"{AZURE_DOMAIN}.azurewebsites.net")
+    
+    # Always add the Azure websites domain
+    ALLOWED_HOSTS.extend([
+        'aarogyarekha-api-india.azurewebsites.net',
+        '.azurewebsites.net'
+    ])
 
 # Application definition
 DJANGO_APPS = [
