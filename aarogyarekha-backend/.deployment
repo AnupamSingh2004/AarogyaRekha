@@ -1,0 +1,5 @@
+# Azure Web App Deployment Configuration
+# Place this file at the root of your repository for Azure App Service deployment
+
+[config]
+command = startup.sh

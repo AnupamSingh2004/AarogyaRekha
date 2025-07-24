@@ -26,3 +26,9 @@ opencv-python==4.8.1.78
 easyocr==1.7.0
 # File handling
 python-magic==0.4.27
+# Production and Azure specific packages
+gunicorn==21.2.0
+whitenoise==6.6.0
+django-storages[azure]==1.14.2
+azure-storage-blob==12.19.0
+sentry-sdk[django]==1.38.0

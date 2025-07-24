@@ -14,6 +14,16 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,10.0.2.2').split(',')
 
+# Azure App Service specific settings
+AZURE_APP_SERVICE = config('AZURE_APP_SERVICE', default=False, cast=bool)
+
+if AZURE_APP_SERVICE:
+    # Add Azure App Service domain to allowed hosts
+    AZURE_DOMAIN = config('AZURE_DOMAIN', default='')
+    if AZURE_DOMAIN:
+        ALLOWED_HOSTS.append(AZURE_DOMAIN)
+        ALLOWED_HOSTS.append(f"{AZURE_DOMAIN}.azurewebsites.net")
+
 # Application definition
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -47,6 +57,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Added for static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -86,6 +97,9 @@ DATABASES = {
         'PASSWORD': config('DATABASE_PASSWORD'),
         'HOST': config('DATABASE_HOST', default='localhost'),
         'PORT': config('DATABASE_PORT', default='5432'),
+        'OPTIONS': {
+            'sslmode': config('DATABASE_SSL_MODE', default='prefer'),
+        } if not DEBUG else {},
     }
 }
 
@@ -108,18 +122,46 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+# Internationalization - India specific
+LANGUAGE_CODE = config('LANGUAGE_CODE', default='en-in')
+TIME_ZONE = config('TIME_ZONE', default='Asia/Kolkata')
 USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Changed for Azure compatibility
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Azure Blob Storage for static and media files (optional but recommended)
+USE_AZURE_STORAGE = config('USE_AZURE_STORAGE', default=False, cast=bool)
+
+if USE_AZURE_STORAGE:
+    AZURE_ACCOUNT_NAME = config('AZURE_ACCOUNT_NAME')
+    AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY')
+    AZURE_CONTAINER = config('AZURE_CONTAINER', default='media')
+    AZURE_STATIC_CONTAINER = config('AZURE_STATIC_CONTAINER', default='static')
+    
+    # Azure Storage settings for media files
+    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    AZURE_STORAGE_ACCOUNT_NAME = AZURE_ACCOUNT_NAME
+    AZURE_STORAGE_ACCOUNT_KEY = AZURE_ACCOUNT_KEY
+    AZURE_STORAGE_CONTAINER = AZURE_CONTAINER
+    
+    # Azure Storage settings for static files
+    STATICFILES_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    AZURE_STATIC_STORAGE_ACCOUNT_NAME = AZURE_ACCOUNT_NAME
+    AZURE_STATIC_STORAGE_ACCOUNT_KEY = AZURE_ACCOUNT_KEY
+    AZURE_STATIC_STORAGE_CONTAINER = AZURE_STATIC_CONTAINER
+else:
+    # Use WhiteNoise for static files when not using Azure Storage
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# WhiteNoise configuration
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = DEBUG
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -176,8 +218,8 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-# CORS Settings - Update these
-CORS_ALLOWED_ORIGINS = [
+# CORS Settings - Production ready
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='').split(',') if not DEBUG else [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://10.0.2.2:8000",  # Android emulator
@@ -196,18 +238,26 @@ CORS_ALLOWED_ORIGINS = [
     "http://192.168.1.0:8000",
 ]
 
+# Add Azure domain to CORS if in production
+if AZURE_APP_SERVICE and config('AZURE_DOMAIN', default=''):
+    azure_domain = config('AZURE_DOMAIN')
+    CORS_ALLOWED_ORIGINS.extend([
+        f"https://{azure_domain}.azurewebsites.net",
+        f"https://{azure_domain}",
+    ])
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only for development
 
-# CSRF Settings - Update these
-CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+# CSRF Settings - Production ready
+CSRF_COOKIE_SECURE = not DEBUG  # Use secure cookies in production
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_NAME = 'csrftoken'
 
-# For mobile apps, you might want to disable CSRF for API endpoints
-CSRF_TRUSTED_ORIGINS = [
+# CSRF Trusted Origins - Production ready
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='').split(',') if not DEBUG else [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://10.0.2.2:8000",
@@ -216,6 +266,14 @@ CSRF_TRUSTED_ORIGINS = [
     "http://192.168.1.6:8000",
     "http://192.168.1.6:3000",
 ]
+
+# Add Azure domain to CSRF trusted origins if in production
+if AZURE_APP_SERVICE and config('AZURE_DOMAIN', default=''):
+    azure_domain = config('AZURE_DOMAIN')
+    CSRF_TRUSTED_ORIGINS.extend([
+        f"https://{azure_domain}.azurewebsites.net",
+        f"https://{azure_domain}",
+    ])
 
 # Additional CORS settings for mobile apps
 CORS_ALLOW_HEADERS = [
@@ -297,28 +355,48 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
 
 # Custom Settings
 OTP_EXPIRY_MINUTES = config('OTP_EXPIRY_MINUTES', default=10, cast=int)
 OTP_LENGTH = config('OTP_LENGTH', default=6, cast=int)
 
-# Logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'django.log',
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
-    },
+# India-specific optimizations
+INDIA_SPECIFIC_SETTINGS = {
+    'MOBILE_NETWORK_OPTIMIZATION': True,
+    'LOW_BANDWIDTH_MODE': config('LOW_BANDWIDTH_MODE', default=True, cast=bool),
+    'REGIONAL_CDN': config('REGIONAL_CDN', default=True, cast=bool),
+    'IST_TIMEZONE_SUPPORT': True,
+}
+
+# Mobile network optimization for India
+if INDIA_SPECIFIC_SETTINGS['MOBILE_NETWORK_OPTIMIZATION']:
+    # Reduce timeout for mobile networks
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
+        'anon': '200/hour',  # Increased for mobile users
+        'user': '2000/hour'  # Increased for mobile users
+    }
+    
+    # Enable compression for mobile networks
+    MIDDLEWARE.insert(1, 'django.middleware.gzip.GZipMiddleware')
+
+# Low bandwidth mode for rural areas
+if INDIA_SPECIFIC_SETTINGS['LOW_BANDWIDTH_MODE']:
+    # Compress responses
+    USE_GZIP = True
+    # Reduce image quality for mobile
+    THUMBNAIL_QUALITY = 75
+    # Cache more aggressively
+    CACHE_MIDDLEWARE_SECONDS = 300
+
+# Healthcare-specific settings for India
+HEALTHCARE_SETTINGS = {
+    'PATIENT_DATA_RETENTION_DAYS': config('PATIENT_DATA_RETENTION_DAYS', default=365, cast=int),
+    'MANDATORY_PRIVACY_CONSENT': True,
+    'ASHA_WORKER_SUPPORT': True,
+    'MULTILINGUAL_SUPPORT': True,
+    'TELEMEDICINE_INTEGRATION': config('TELEMEDICINE_INTEGRATION', default=False, cast=bool),
 }
